@@ -33,14 +33,16 @@ def loadSave(save, driver):
 def storeSave(driver):
     log("Save thread starting")
     while driver.session_id:
-        save = driver.execute_script('return window.localStorage.getItem("dimensionSave")')
+        save = driver.execute_script(
+            'return window.localStorage.getItem("dimensionSave")'
+        )
         if save is not None:
             with open("session.txt", "w") as f:
                 f.write(save)
             log("Saving")
         else:
-            print("Game has not produced a save yet, retrying in 5s")
-        time.sleep(5)
+            print("Game has not produced a save yet, retrying in 15s")
+        time.sleep(15)
 
 
 if __name__ == "__main__":
@@ -61,6 +63,26 @@ if __name__ == "__main__":
     # Run save thread
     save_thread = Thread(target=storeSave, args=(driver,))
     save_thread.start()
+
+
+# MAIN LOOP
+while True:
+    # Click Max all
+    driver.execute_script('$("#maxall.storebtn").click()')
+    # Get antimatter
+    antimatter = driver.execute_script("return player.money;")
+    log(f"Antimatter: {antimatter}")
+    # Initial 1st dimension
+    if antimatter == "10":
+        driver.execute_script('$("#first.storebtn").click()')
+    driver.execute_script('$("#softReset.storebtn").click()')
+    time.sleep(0.5)
+
+    # Check for 1st dimension availability
+    # ad1check = driver.execute_script('return $("#first.storebtn").length')
+    # if ad1check:
+    #     driver.execute_script('$("#first.storebtn").click()')
+    # time.sleep(1)
 
     # Get antimatter
     # try:
